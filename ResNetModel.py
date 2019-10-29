@@ -9,7 +9,7 @@ from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.layers import AveragePooling2D
 from keras.layers import Add
-from keras.layers.normalization import BatchNormalization
+from keras.layers import BatchNormalization
 from keras.regularizers import l2
 
 
