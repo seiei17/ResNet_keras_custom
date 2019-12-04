@@ -8,9 +8,15 @@ Building ResNet by keras after reading ResNet paper.
 
 作者经过研究发现，在随着网络结构逐渐变深的情况下，会出现一种**退化 (Degradation)** 现象。表现为，随着网络深度的增加，准确率会逐渐上升并达到饱和，随后会急剧的下降。这种退化现象并不是由过拟合引起的。
 
+![degra](./depository/degra.png)
+
 作者提出一种残差块结构.
+
+![res](./depository/resblock.png)
+
 这种结构方法表示出一个特性：**深层网络模型不会比它对应的浅层结构产生更高的误差。**其中，恒等映射x称为**shortcut**。
 残差结构跟 **“highway networks”** 有着相似的结构。
+
 * highway有gating functions，触发效果的gate是数据独立的且有着自身的参数，并且当gate关闭的时候，highway结构就没有残差的功能了。
 * 本文提出的残差结构是不需要 **训练参数（parameter-free）** 的，并且这种恒等映射永远不会关闭，也就是一直会存在残差的功能。
 
@@ -25,26 +31,36 @@ Building ResNet by keras after reading ResNet paper.
 
 假设期望的最优输出更接近于恒等映射x而不是0映射，那么测量输出的扰动会更加容易。
 如假设在W1参数情况下，H(x)=1.1, x=1, F(x)=0.1；当参数改变，在W2参数情况下，H(x)=1.2, x=1, F(x)=0.2，那么计算变化率：
-$$\sigma_1=(1.2-1.1)/1.1=0.09$$
-$$\sigma_2=(0.2-0.1)/0.1=1$$
+<img src="https://latex.codecogs.com/gif.latex?$$\sigma_1=(1.2-1.1)/1.1=0.09$$" title="$$\sigma_1=(1.2-1.1)/1.1=0.09$$" />
+<img src="https://latex.codecogs.com/gif.latex?$$\sigma_2=(0.2-0.1)/0.1=1$$" title="$$\sigma_2=(0.2-0.1)/0.1=1$$" />
 可以看出，残差结构下的变化更容易测量。
 
 ##### Identity Mapping by Shortcuts
 考虑两种情况：
 * 输入输出同维度：
-则residual block的输出表示为：$y=F(x, {W_i})+x$ 。所以残差输出为 $F=W_1\sigma (W_2x)$，$\sigma$是ReLU，所以输出y=F+x。
+则residual block的输出表示为：<img src="https://latex.codecogs.com/gif.latex?$y=F(x,&space;{W_i})&plus;x$" title="$y=F(x, {W_i})+x$" /> 。所以残差输出为<img src="https://latex.codecogs.com/gif.latex?$F=W_1\sigma&space;(W_2x)$" title="$F=W_1\sigma (W_2x)$" />，<img src="https://latex.codecogs.com/gif.latex?$\sigma$" title="$\sigma$" />是ReLU，所以输出y=F+x。
 * 输入输出不同维度：
-则residual block的输出表示为：$y=F(x, {W_i}) + W_sx$。即需要对恒等映射x进行一个维度的变换。
+则residual block的输出表示为：<img src="https://latex.codecogs.com/gif.latex?$y=F(x,&space;{W_i})&space;&plus;&space;W_sx$" title="$y=F(x, {W_i}) + W_sx$" />。即需要对恒等映射x进行一个维度的变换。
 
 #### 网络结构
+
+![architecture](./depository/architecture.png)
+
 * Plain network以VGG为基础，均使用3x3的卷积，存在两个原则：
 1. 对于输出相同的层，卷积核的个数应该相同；
 2. 对于输出不同的层，当size减半的时候，卷积核的个数应该扩大为2倍以保留相同的时间复杂度。
 * 结构中所有的下采样均使用stride=2的卷积来进行操作。
+
 * 最后是全局的average pooling和全连接。
+
 * 注意，结构中的虚线shortcut表示维度尺寸发生变化。
 
+  ![ar2](./depository/archi2.png)
+
 ##### 残差网络
+
+![bottle](./depository/bottle.png)
+
 当维度发生变化的时候，有两种操作选择：
 1. shortcut仍然保持恒等映射，增加的维度用0来填充。
 2. shortcut进行1x1卷积操作来增加维度，步长strides选择为2。
